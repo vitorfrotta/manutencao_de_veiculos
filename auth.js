@@ -43,11 +43,11 @@ function checkSenhaForte() {
   if (!senha) { el.style.display = 'none'; return; }
   el.style.display = 'flex';
   let score = 0;
-  if (senha.length >= 6)             score++;
-  if (senha.length >= 10)            score++;
-  if (/[A-Z]/.test(senha))           score++;
-  if (/[0-9]/.test(senha))           score++;
-  if (/[^A-Za-z0-9]/.test(senha))    score++;
+  if (senha.length >= 6)           score++;
+  if (senha.length >= 10)          score++;
+  if (/[A-Z]/.test(senha))         score++;
+  if (/[0-9]/.test(senha))         score++;
+  if (/[^A-Za-z0-9]/.test(senha))  score++;
   const niveis = [
     { label: 'Muito fraca', color: '#ef4444', w: '20%'  },
     { label: 'Fraca',       color: '#f97316', w: '40%'  },
@@ -99,7 +99,7 @@ function entrar() {
     showErro('loginErro', '⚠️ Preencha o usuário e a senha.');
     return;
   }
-  const usuarios  = garantirAdmin();
+  const usuarios   = garantirAdmin();
   const encontrado = usuarios.find(u => u.usuario === usuario && u.senha === senha);
   if (!encontrado) {
     showErro('loginErro', '❌ Usuário ou senha incorretos.');
@@ -120,8 +120,8 @@ function cadastrar() {
   const usuario  = (document.getElementById('cadUsuario').value || '').trim();
   const senha    =  document.getElementById('cadSenha').value   || '';
   const confirma =  document.getElementById('cadConfirma').value || '';
-  if (!nome)    { showErro('cadErro', '⚠️ Informe seu nome completo.');      document.getElementById('cadNome').focus();    return; }
-  if (!usuario) { showErro('cadErro', '⚠️ Escolha um nome de usuário.');     document.getElementById('cadUsuario').focus(); return; }
+  if (!nome)    { showErro('cadErro', '⚠️ Informe seu nome completo.');             document.getElementById('cadNome').focus();    return; }
+  if (!usuario) { showErro('cadErro', '⚠️ Escolha um nome de usuário.');            document.getElementById('cadUsuario').focus(); return; }
   if (/\s/.test(usuario)) { showErro('cadErro', '⚠️ O usuário não pode conter espaços.'); document.getElementById('cadUsuario').focus(); return; }
   if (!senha || senha.length < 6) { showErro('cadErro', '⚠️ A senha deve ter pelo menos 6 caracteres.'); document.getElementById('cadSenha').focus(); return; }
   if (senha !== confirma) {
@@ -148,21 +148,7 @@ function cadastrar() {
 function irParaCadastro() { window.location.href = 'cadastro.html'; }
 function voltar()          { window.location.href = 'login.html';   }
 
-// ── PROTEÇÃO DE ROTA ───────────────────────────────
-// Só protege index.html quando acessado via servidor HTTP (não file://)
-(function verificarSessao() {
-  const proto   = window.location.protocol;
-  const pagina  = window.location.pathname;
-  const emIndex = pagina.endsWith('index.html') || pagina.endsWith('/') || pagina === '';
-  if (emIndex && proto !== 'file:') {
-    const logado = sessionStorage.getItem('fc_logado');
-    if (!logado) {
-      window.location.href = 'login.html';
-    }
-  }
-})();
-
-// ── ENTER NOS CAMPOS ──────────────────────────────
+// ── ENTER NOS CAMPOS ───────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   const loginUsuario = document.getElementById('loginUsuario');
   const loginSenha   = document.getElementById('loginSenha');
