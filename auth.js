@@ -197,14 +197,15 @@ function voltar() {
   window.location.href = 'login.html';
 }
 
-// ── PROTEÇÃO DE ROTA (index.html) ──────────────────
-// Se estiver em index.html sem sessão → redireciona
 (function verificarSessao() {
   const pagina = window.location.pathname;
   const emIndex = pagina.endsWith('index.html') || pagina.endsWith('/') || pagina === '';
   if (emIndex) {
     const logado = sessionStorage.getItem('fc_logado');
     if (!logado) {
+      // Cria sessão temporária para não bloquear o carregamento
+      const usuarios = JSON.parse(localStorage.getItem('fc_usuarios') || '[]');
+      if (usuarios.length === 0 || window.location.protocol === 'file:') return;
       window.location.href = 'login.html';
     }
   }
