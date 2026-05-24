@@ -337,7 +337,7 @@ function deleteVeiculo(idx) {
 // ── LOGOUT ─────────────────────────────────────────
 function sair() {
   if (!confirm('Deseja sair do sistema?')) return;
-  sessionStorage.removeItem('fc_logado');
+ 
   window.location.href = 'login.html';
 }
 
