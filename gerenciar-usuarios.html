@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FleetCare – Gerenciar Usuários</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👤</text></svg>"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="auth.css"/>
+  <link rel="stylesheet" href="cadastros.css"/>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="cad-header">
+    <div class="cad-header-inner">
+      <div class="logo" onclick="window.location.href='index.html'" style="cursor:pointer">
+        <div class="auth-logo-icon" style="width:40px;height:40px;padding:5px">
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 38 L12 26 L20 22 L44 22 L52 26 L56 38 L56 44 L8 44 Z" fill="white" opacity="0.95"/>
+            <circle cx="18" cy="44" r="7" fill="#0d3d47"/><circle cx="18" cy="44" r="3.5" fill="white" opacity="0.7"/>
+            <circle cx="46" cy="44" r="7" fill="#0d3d47"/><circle cx="46" cy="44" r="3.5" fill="white" opacity="0.7"/>
+          </svg>
+        </div>
+        <span class="auth-logo-name" style="font-size:18px">FleetCare</span>
+      </div>
+      <button type="button" class="cad-back-btn" onclick="window.location.href='index.html'">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Voltar ao Sistema
+      </button>
+    </div>
+  </header>
+
+  <div class="cad-page">
+    <div class="cad-container">
+
+      <!-- TÍTULO + BOTÃO CADASTRAR -->
+      <div class="cad-title-area" style="justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:16px">
+          <div class="cad-icon-box">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div>
+            <h1 class="cad-title">Gerenciar Usuários</h1>
+            <p class="cad-subtitle">Cadastre, edite ou remova usuários do sistema</p>
+          </div>
+        </div>
+        <button type="button" class="gu-btn-novo" onclick="abrirModalCadastro()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Cadastrar Usuário
+        </button>
+      </div>
+
+      <!-- TABELA DE USUÁRIOS -->
+      <div class="cad-card">
+        <div class="cad-section-title">Usuários Cadastrados</div>
+        <div id="loadingMsg" style="text-align:center;padding:32px;color:var(--text-muted);font-size:14px">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite;vertical-align:middle;margin-right:8px"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+          Carregando usuários...
+        </div>
+        <div class="cad-table-wrapper" id="tabelaWrapper" style="display:none">
+          <table class="cad-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Nome</th>
+                <th>Usuário (login)</th>
+                <th>Cadastrado em</th>
+                <th style="text-align:right">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaUsuarios"></tbody>
+          </table>
+        </div>
+        <div id="emptyUsuarios" class="cad-empty" style="display:none">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          <p>Nenhum usuário cadastrado</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       MODAL CADASTRAR / EDITAR USUÁRIO
+  ══════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modalUsuario">
+    <div class="cad-modal" style="max-width:480px">
+      <div class="cad-modal-header">
+        <h3 id="modalUsuarioTitulo">Cadastrar Usuário</h3>
+        <button type="button" class="modal-close-btn" onclick="fecharModal()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="cad-modal-body">
+        <input type="hidden" id="editUserId"/>
+        <div style="display:flex;flex-direction:column;gap:16px">
+
+          <div class="form-group">
+            <label class="form-label">Nome completo *</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </span>
+              <input type="text" class="form-input" id="muNome" placeholder="Ex: João da Silva"/>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Usuário (login) *</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+              </span>
+              <input type="text" class="form-input" id="muLogin" placeholder="Ex: joao.silva"/>
+            </div>
+            <span class="form-hint">Sem espaços ou caracteres especiais</span>
+          </div>
+
+          <!-- Senha só aparece no cadastro, não na edição -->
+          <div class="form-group" id="senhaGroup">
+            <label class="form-label">Senha *</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </span>
+              <input type="password" class="form-input" id="muSenha" placeholder="Mínimo 6 caracteres" oninput="checkSenhaModal()"/>
+              <button type="button" class="toggle-pass" onclick="togglePassModal()" tabindex="-1">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div class="senha-forte" id="senhaForteModal" style="display:none">
+              <div class="senha-barra"><div class="senha-barra-fill" id="senhaBarraModal"></div></div>
+              <span class="senha-label" id="senhaLabelModal"></span>
+            </div>
+          </div>
+
+          <div class="form-group" id="confirmaGroup">
+            <label class="form-label">Confirmar senha *</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </span>
+              <input type="password" class="form-input" id="muConfirma" placeholder="Repita a senha"/>
+              <button type="button" class="toggle-pass" onclick="togglePassModal2()" tabindex="-1">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+
+        </div>
+        <div id="modalErro" class="auth-erro" style="display:none;margin-top:14px"></div>
+      </div>
+      <div class="cad-modal-footer">
+        <button type="button" class="btn-auth btn-outline-auth" style="flex:1" onclick="fecharModal()">Cancelar</button>
+        <button type="button" class="btn-auth btn-primary-auth" style="flex:1" id="btnSalvarUsuario" onclick="salvarUsuario()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Salvar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CONFIRMAÇÃO EXCLUSÃO -->
+  <div class="modal-overlay" id="modalDeletar">
+    <div class="cad-modal" style="max-width:400px">
+      <div class="cad-modal-header">
+        <h3 style="color:#dc2626">Remover Usuário</h3>
+        <button type="button" class="modal-close-btn" onclick="fecharModalDeletar()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="cad-modal-body">
+        <p style="font-size:14px;color:var(--text-muted);line-height:1.6">
+          Tem certeza que deseja remover o usuário <strong id="nomeParaDeletar"></strong>?<br/>
+          Esta ação não pode ser desfeita.
+        </p>
+      </div>
+      <div class="cad-modal-footer">
+        <button type="button" class="btn-auth btn-outline-auth" style="flex:1" onclick="fecharModalDeletar()">Cancelar</button>
+        <button type="button" class="btn-auth" style="flex:1;background:#dc2626;color:white;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;padding:13px 24px;cursor:pointer" id="btnConfirmarDeletar" onclick="confirmarDeletar()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
+          Remover
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const API_URL = 'https://fleetcare-api.onrender.com';
+    let usuarioParaDeletar = null;
+    let modoEdicao = false;
+
+    // ── TOAST ──
+    let toastTimer;
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg; el.className = 'toast show';
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+    }
+    function showErro(id, msg) {
+      const el = document.getElementById(id);
+      el.textContent = msg; el.style.display = 'block';
+    }
+    function hideErro(id) {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    }
+    function setLoading(btnId, loading, textoHTML) {
+      const btn = document.getElementById(btnId);
+      if (!btn) return;
+      btn.disabled = loading;
+      btn.innerHTML = loading
+        ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Aguarde...`
+        : textoHTML;
+    }
+
+    function formatDate(str) {
+      if (!str) return '–';
+      const d = new Date(str);
+      return d.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric' });
+    }
+
+    // ── FORÇA SENHA ──
+    function checkSenhaModal() {
+      const senha = document.getElementById('muSenha').value || '';
+      const el    = document.getElementById('senhaForteModal');
+      const fill  = document.getElementById('senhaBarraModal');
+      const label = document.getElementById('senhaLabelModal');
+      if (!senha) { el.style.display = 'none'; return; }
+      el.style.display = 'flex';
+      let score = 0;
+      if (senha.length >= 6)          score++;
+      if (senha.length >= 10)         score++;
+      if (/[A-Z]/.test(senha))        score++;
+      if (/[0-9]/.test(senha))        score++;
+      if (/[^A-Za-z0-9]/.test(senha)) score++;
+      const niveis = [
+        { label:'Muito fraca', color:'#ef4444', w:'20%' },
+        { label:'Fraca',       color:'#f97316', w:'40%' },
+        { label:'Razoável',    color:'#eab308', w:'60%' },
+        { label:'Forte',       color:'#22c55e', w:'80%' },
+        { label:'Muito forte', color:'#16a34a', w:'100%'},
+      ];
+      const n = niveis[Math.min(score-1, 4)] || niveis[0];
+      fill.style.width = n.w; fill.style.background = n.color;
+      label.textContent = n.label; label.style.color = n.color;
+    }
+
+    function togglePassModal() {
+      const i = document.getElementById('muSenha');
+      i.type = i.type === 'password' ? 'text' : 'password';
+    }
+    function togglePassModal2() {
+      const i = document.getElementById('muConfirma');
+      i.type = i.type === 'password' ? 'text' : 'password';
+    }
+
+    // ── CARREGAR USUÁRIOS ──
+    async function carregarUsuarios() {
+      try {
+        const resp = await fetch(`${API_URL}/api/usuarios`);
+        const usuarios = await resp.json();
+        document.getElementById('loadingMsg').style.display = 'none';
+
+        if (!usuarios.length) {
+          document.getElementById('emptyUsuarios').style.display = 'flex';
+          document.getElementById('tabelaWrapper').style.display = 'none';
+          return;
+        }
+
+        document.getElementById('emptyUsuarios').style.display = 'none';
+        document.getElementById('tabelaWrapper').style.display = 'block';
+
+        document.getElementById('tabelaUsuarios').innerHTML = usuarios.map(u => `
+          <tr>
+            <td><span style="font-size:12px;color:var(--text-light)">#${u.usuario_id}</span></td>
+            <td><strong>${u.nome}</strong></td>
+            <td><span class="cad-placa" style="letter-spacing:0">${u.login}</span></td>
+            <td style="font-size:13px;color:var(--text-muted)">${formatDate(u.atualizado_em)}</td>
+            <td>
+              <div style="display:flex;gap:8px;justify-content:flex-end">
+                <button type="button" class="gu-btn-editar" onclick="abrirModalEdicao(${u.usuario_id}, '${u.nome.replace(/'/g,"\\'")}', '${u.login}')" title="Editar">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  Editar
+                </button>
+                <button type="button" class="cad-btn-del" style="width:auto;padding:0 12px;gap:6px;display:flex;align-items:center;font-size:13px;font-weight:500" onclick="abrirModalDeletar(${u.usuario_id}, '${u.nome.replace(/'/g,"\\'")}')">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
+                  Apagar
+                </button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      } catch (e) {
+        document.getElementById('loadingMsg').innerHTML = '❌ Erro ao carregar usuários. Verifique a API.';
+        console.error(e);
+      }
+    }
+
+    // ── MODAL CADASTRO ──
+    function abrirModalCadastro() {
+      modoEdicao = false;
+      document.getElementById('modalUsuarioTitulo').textContent = 'Cadastrar Usuário';
+      document.getElementById('editUserId').value = '';
+      document.getElementById('muNome').value    = '';
+      document.getElementById('muLogin').value   = '';
+      document.getElementById('muSenha').value   = '';
+      document.getElementById('muConfirma').value = '';
+      document.getElementById('senhaForteModal').style.display = 'none';
+      document.getElementById('senhaGroup').style.display    = 'flex';
+      document.getElementById('confirmaGroup').style.display = 'flex';
+      hideErro('modalErro');
+      document.getElementById('modalUsuario').classList.add('open');
+      setTimeout(() => document.getElementById('muNome').focus(), 100);
+    }
+
+    // ── MODAL EDIÇÃO ──
+    function abrirModalEdicao(id, nome, login) {
+      modoEdicao = true;
+      document.getElementById('modalUsuarioTitulo').textContent = 'Editar Usuário';
+      document.getElementById('editUserId').value  = id;
+      document.getElementById('muNome').value      = nome;
+      document.getElementById('muLogin').value     = login;
+      document.getElementById('senhaGroup').style.display    = 'none';
+      document.getElementById('confirmaGroup').style.display = 'none';
+      hideErro('modalErro');
+      document.getElementById('modalUsuario').classList.add('open');
+      setTimeout(() => document.getElementById('muNome').focus(), 100);
+    }
+
+    function fecharModal() {
+      document.getElementById('modalUsuario').classList.remove('open');
+    }
+
+    // ── SALVAR (CADASTRO OU EDIÇÃO) ──
+    async function salvarUsuario() {
+      hideErro('modalErro');
+      const nome    = document.getElementById('muNome').value.trim();
+      const login   = document.getElementById('muLogin').value.trim();
+      const senha   = document.getElementById('muSenha').value;
+      const confirma = document.getElementById('muConfirma').value;
+
+      if (!nome)  { showErro('modalErro', '⚠️ Informe o nome completo.');  return; }
+      if (!login) { showErro('modalErro', '⚠️ Informe o usuário (login).'); return; }
+      if (/\s/.test(login)) { showErro('modalErro', '⚠️ O usuário não pode conter espaços.'); return; }
+
+      if (!modoEdicao) {
+        if (!senha || senha.length < 6) { showErro('modalErro', '⚠️ A senha deve ter pelo menos 6 caracteres.'); return; }
+        if (senha !== confirma)          { showErro('modalErro', '❌ As senhas não coincidem.'); return; }
+      }
+
+      const btnHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Salvar`;
+      setLoading('btnSalvarUsuario', true, btnHTML);
+
+      try {
+        let resp;
+        if (modoEdicao) {
+          const id = document.getElementById('editUserId').value;
+          resp = await fetch(`${API_URL}/api/usuarios/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nome, login })
+          });
+        } else {
+          resp = await fetch(`${API_URL}/api/usuarios`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nome, usuario: login, senha })
+          });
+        }
+
+        const data = await resp.json();
+        if (!resp.ok) { showErro('modalErro', '❌ ' + (data.erro || 'Erro ao salvar.')); return; }
+
+        fecharModal();
+        showToast(modoEdicao ? '✅ Usuário atualizado!' : '✅ Usuário cadastrado!');
+        carregarUsuarios();
+      } catch (e) {
+        showErro('modalErro', '❌ Erro ao conectar à API.');
+      } finally {
+        setLoading('btnSalvarUsuario', false, btnHTML);
+      }
+    }
+
+    // ── MODAL DELETAR ──
+    function abrirModalDeletar(id, nome) {
+      usuarioParaDeletar = id;
+      document.getElementById('nomeParaDeletar').textContent = nome;
+      document.getElementById('modalDeletar').classList.add('open');
+    }
+    function fecharModalDeletar() {
+      usuarioParaDeletar = null;
+      document.getElementById('modalDeletar').classList.remove('open');
+    }
+    async function confirmarDeletar() {
+      if (!usuarioParaDeletar) return;
+      setLoading('btnConfirmarDeletar', true, '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg> Remover');
+      try {
+        const resp = await fetch(`${API_URL}/api/usuarios/${usuarioParaDeletar}`, { method: 'DELETE' });
+        const data = await resp.json();
+        if (!resp.ok) { showToast('❌ ' + (data.erro || 'Erro ao remover.')); return; }
+        fecharModalDeletar();
+        showToast('🗑️ Usuário removido.');
+        carregarUsuarios();
+      } catch (e) {
+        showToast('❌ Erro ao conectar à API.');
+      } finally {
+        setLoading('btnConfirmarDeletar', false, '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg> Remover');
+      }
+    }
+
+    // ── FECHAR AO CLICAR FORA ──
+    document.addEventListener('DOMContentLoaded', () => {
+      carregarUsuarios();
+      ['modalUsuario','modalDeletar'].forEach(id => {
+        document.getElementById(id).addEventListener('click', function(e) {
+          if (e.target === this) {
+            if (id === 'modalUsuario') fecharModal();
+            else fecharModalDeletar();
+          }
+        });
+      });
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') { fecharModal(); fecharModalDeletar(); }
+      });
+    });
+  </script>
+</body>
+</html>
