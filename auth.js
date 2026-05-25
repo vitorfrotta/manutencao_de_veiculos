@@ -144,7 +144,6 @@ async function cadastrar() {
   const usuario  = (document.getElementById('cadUsuario').value || '').trim();
   const senha    =  document.getElementById('cadSenha').value   || '';
   const confirma =  document.getElementById('cadConfirma').value || '';
-  const email    = (document.getElementById('cadEmail')?.value  || '').trim();
   const btn      =  document.querySelector('.btn-primary-auth');
 
   if (!nome)    { showErro('cadErro', '⚠️ Informe seu nome completo.');                   document.getElementById('cadNome').focus();    return; }
