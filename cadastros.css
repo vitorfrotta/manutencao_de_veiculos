@@ -1,0 +1,245 @@
+/* =====================================================
+   FleetCare – Cadastros (Veículo + Serviço)
+   ===================================================== */
+
+:root {
+  --petrol: #1a7a8a;
+  --petrol-dark: #0d5566;
+  --petrol-deeper: #0a3d4d;
+  --petrol-light: #2a9aab;
+  --petrol-pale: #e6f4f7;
+  --petrol-faint: #f0f9fb;
+  --danger: #dc2626;
+  --danger-light: #fee2e2;
+  --text: #0f2733;
+  --text-muted: #4a6572;
+  --text-light: #7a9aa8;
+  --border: #cde4ea;
+  --border-light: #e8f4f7;
+  --bg: #f4f9fb;
+  --surface: #ffffff;
+  --shadow-sm: 0 1px 3px rgba(10,60,77,0.08);
+  --shadow-md: 0 4px 16px rgba(10,60,77,0.10);
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+/* ── HEADER ── */
+.cad-header {
+  background: linear-gradient(135deg, var(--petrol-deeper) 0%, var(--petrol-dark) 50%, var(--petrol) 100%);
+  box-shadow: 0 2px 20px rgba(10,60,77,0.3);
+  position: sticky; top: 0; z-index: 100;
+}
+
+.cad-header-inner {
+  max-width: 900px; margin: 0 auto;
+  padding: 0 24px; height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.cad-back-btn {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: white; font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 500;
+  padding: 8px 16px; border-radius: 8px;
+  cursor: pointer; transition: all 0.18s;
+}
+.cad-back-btn:hover { background: rgba(255,255,255,0.2); }
+
+/* ── PAGE ── */
+.cad-page { background: var(--bg); min-height: calc(100vh - 64px); padding: 32px 20px; }
+.cad-container { max-width: 900px; margin: 0 auto; }
+
+/* ── TITLE AREA ── */
+.cad-title-area {
+  display: flex; align-items: center; gap: 16px; margin-bottom: 24px;
+}
+.cad-icon-box {
+  width: 52px; height: 52px;
+  background: var(--petrol);
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  color: white; flex-shrink: 0;
+  box-shadow: 0 4px 14px rgba(26,122,138,0.35);
+}
+.cad-title {
+  font-family: 'Syne', sans-serif; font-weight: 700;
+  font-size: 24px; color: var(--petrol-deeper); line-height: 1.1;
+}
+.cad-subtitle { font-size: 14px; color: var(--text-muted); margin-top: 3px; }
+
+/* ── CARD ── */
+.cad-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+  padding: 26px 28px;
+}
+
+.cad-section-title {
+  font-family: 'Syne', sans-serif; font-weight: 600;
+  font-size: 14px; color: var(--petrol);
+  text-transform: uppercase; letter-spacing: 0.5px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1.5px solid var(--border-light);
+}
+
+/* ── FORM GRID ── */
+.cad-form-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+}
+.cad-span-2 { grid-column: 1 / -1; }
+
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label { font-size: 13px; font-weight: 600; color: var(--text); }
+.form-input {
+  font-family: 'DM Sans', sans-serif; font-size: 14px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface); color: var(--text);
+  outline: none; transition: border 0.18s, box-shadow 0.18s; width: 100%;
+}
+.form-input:focus { border-color: var(--petrol); box-shadow: 0 0 0 3px rgba(26,122,138,0.12); }
+
+/* ── ACTIONS ── */
+.cad-form-actions {
+  display: flex; gap: 12px; justify-content: flex-end;
+  margin-top: 24px; padding-top: 20px;
+  border-top: 1.5px solid var(--border-light);
+}
+
+/* ── ADD BUTTON (+ marca) ── */
+.cad-btn-add {
+  width: 42px; height: 42px; flex-shrink: 0;
+  background: var(--petrol); color: white;
+  border: none; border-radius: var(--radius-sm);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 0.18s;
+}
+.cad-btn-add:hover { background: var(--petrol-dark); }
+
+/* ── TABLE ── */
+.cad-table-wrapper { overflow-x: auto; }
+.cad-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.cad-table thead tr { background: var(--petrol-faint); }
+.cad-table th {
+  padding: 12px 14px; text-align: left;
+  font-family: 'Syne', sans-serif; font-weight: 600;
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+  color: var(--petrol); border-bottom: 2px solid var(--border);
+}
+.cad-table td {
+  padding: 12px 14px; border-bottom: 1px solid var(--border-light);
+  color: var(--text); vertical-align: middle;
+}
+.cad-table tbody tr:hover { background: var(--petrol-faint); }
+.cad-table tbody tr:last-child td { border-bottom: none; }
+
+.cad-placa {
+  font-family: monospace; font-size: 12px; font-weight: 700;
+  background: var(--petrol-pale); color: var(--petrol);
+  padding: 3px 8px; border-radius: 4px; letter-spacing: 1px;
+}
+
+.cad-tipo-badge {
+  display: inline-block; padding: 3px 10px;
+  border-radius: 20px; font-size: 11px; font-weight: 600;
+}
+
+.cad-btn-del {
+  width: 30px; height: 30px;
+  background: var(--danger-light); color: var(--danger);
+  border: none; border-radius: 6px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.cad-btn-del:hover { background: var(--danger); color: white; }
+
+/* ── EMPTY ── */
+.cad-empty {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 10px; padding: 40px 20px; color: var(--text-light);
+}
+.cad-empty svg { opacity: 0.3; }
+.cad-empty p { font-size: 14px; color: var(--text-muted); }
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(10,40,55,0.45);
+  backdrop-filter: blur(3px);
+  display: none; align-items: center; justify-content: center;
+  z-index: 200; padding: 20px;
+}
+.modal-overlay.open { display: flex; animation: overlayIn 0.2s ease; }
+@keyframes overlayIn { from{opacity:0} to{opacity:1} }
+
+.cad-modal {
+  background: var(--surface); border-radius: 16px;
+  width: 100%; max-width: 400px;
+  box-shadow: 0 20px 60px rgba(10,60,77,0.2);
+  animation: modalIn 0.25s cubic-bezier(.34,1.3,.64,1);
+}
+@keyframes modalIn { from{opacity:0;transform:scale(0.92) translateY(20px)} to{opacity:1;transform:scale(1) translateY(0)} }
+
+.cad-modal-header {
+  padding: 20px 22px 16px;
+  border-bottom: 1.5px solid var(--border-light);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.cad-modal-header h3 {
+  font-family: 'Syne', sans-serif; font-weight: 700;
+  font-size: 18px; color: var(--petrol-deeper);
+}
+.modal-close-btn {
+  width: 32px; height: 32px; border: none;
+  background: var(--bg); border-radius: 7px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: var(--text-muted); transition: all 0.15s;
+}
+.modal-close-btn:hover { background: var(--danger-light); color: var(--danger); }
+
+.cad-modal-body   { padding: 20px 22px; }
+.cad-modal-footer { padding: 16px 22px 20px; display: flex; gap: 10px; border-top: 1.5px solid var(--border-light); }
+
+/* ── SPIN ── */
+@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+  .cad-form-grid { grid-template-columns: 1fr; }
+  .cad-span-2    { grid-column: 1; }
+  .cad-card      { padding: 18px 16px; }
+  .cad-form-actions { flex-direction: column-reverse; }
+}
+
+/* ── GERENCIAR USUÁRIOS ── */
+.gu-btn-novo {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--petrol); color: white;
+  font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
+  padding: 11px 22px; border: none; border-radius: var(--radius-sm);
+  cursor: pointer; transition: all 0.18s; white-space: nowrap;
+  box-shadow: 0 2px 10px rgba(26,122,138,0.35);
+  flex-shrink: 0;
+}
+.gu-btn-novo:hover { background: var(--petrol-dark); transform: translateY(-1px); }
+
+.gu-btn-editar {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--petrol-pale); color: var(--petrol);
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+  padding: 6px 12px; border: none; border-radius: 6px;
+  cursor: pointer; transition: all 0.15s; height: 30px;
+}
+.gu-btn-editar:hover { background: var(--petrol); color: white; }
+
+@media (max-width: 600px) {
+  .cad-title-area { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .gu-btn-novo { width: 100%; justify-content: center; }
+}
