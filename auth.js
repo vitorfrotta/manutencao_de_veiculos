@@ -1,6 +1,10 @@
-/* ===================================================
+/* =====================================================
    FleetCare – Auth Logic
-   =================================================== */
+   Conectado à API no Render + banco filess.io
+   ===================================================== */
+
+// ── URL DA API ─────────────────────────────────────
+const API_URL = 'https://fleetcare-api.onrender.com';
 
 // ── TOAST ──────────────────────────────────────────
 let toastTimer;
@@ -74,74 +78,111 @@ function hideErro(id) {
   if (el) el.style.display = 'none';
 }
 
-// ── USUÁRIOS ───────────────────────────────────────
-function getUsuarios() {
-  return JSON.parse(localStorage.getItem('fc_usuarios') || '[]');
-}
-function saveUsuarios(users) {
-  localStorage.setItem('fc_usuarios', JSON.stringify(users));
-}
-function garantirAdmin() {
-  const users = getUsuarios();
-  if (!users.length) {
-    users.push({ nome: 'Administrador', usuario: 'admin', email: '', senha: 'admin123' });
-    saveUsuarios(users);
+// ── LOADING NOS BOTÕES ─────────────────────────────
+function setBtnLoading(btnEl, loading) {
+  if (!btnEl) return;
+  btnEl.disabled = loading;
+  if (loading) {
+    btnEl.dataset.original = btnEl.innerHTML;
+    btnEl.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Aguarde...`;
+  } else {
+    btnEl.innerHTML = btnEl.dataset.original || '';
   }
-  return getUsuarios();
 }
 
 // ── LOGIN ──────────────────────────────────────────
-function entrar() {
+async function entrar() {
   hideErro('loginErro');
   const usuario = (document.getElementById('loginUsuario').value || '').trim();
   const senha   =  document.getElementById('loginSenha').value   || '';
+  const btn     =  document.querySelector('.btn-primary-auth');
+
   if (!usuario || !senha) {
     showErro('loginErro', '⚠️ Preencha o usuário e a senha.');
     return;
   }
-  const usuarios   = garantirAdmin();
-  const encontrado = usuarios.find(u => u.usuario === usuario && u.senha === senha);
-  if (!encontrado) {
-    showErro('loginErro', '❌ Usuário ou senha incorretos.');
-    const el = document.getElementById('loginSenha');
-    el.classList.add('error');
-    setTimeout(() => el.classList.remove('error'), 1500);
-    return;
+
+  setBtnLoading(btn, true);
+
+  try {
+    const resp = await fetch(`${API_URL}/api/login`, {
+      method : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body   : JSON.stringify({ usuario, senha })
+    });
+
+    const data = await resp.json();
+
+    if (!resp.ok) {
+      showErro('loginErro', '❌ ' + (data.erro || 'Usuário ou senha incorretos.'));
+      const el = document.getElementById('loginSenha');
+      if (el) { el.classList.add('error'); setTimeout(() => el.classList.remove('error'), 1500); }
+      return;
+    }
+
+    sessionStorage.setItem('fc_logado', JSON.stringify({
+      id     : data.usuario.id,
+      nome   : data.usuario.nome,
+      usuario: data.usuario.login
+    }));
+
+    showToast('✅ Bem-vindo, ' + data.usuario.nome.split(' ')[0] + '!');
+    setTimeout(() => { window.location.href = 'index.html'; }, 700);
+
+  } catch (err) {
+    showErro('loginErro', '❌ Não foi possível conectar à API. Tente novamente.');
+    console.error('Erro no login:', err);
+  } finally {
+    setBtnLoading(btn, false);
   }
-  sessionStorage.setItem('fc_logado', JSON.stringify({ nome: encontrado.nome, usuario: encontrado.usuario }));
-  showToast('✅ Bem-vindo, ' + encontrado.nome.split(' ')[0] + '!');
-  setTimeout(() => { window.location.href = 'index.html'; }, 700);
 }
 
 // ── CADASTRAR ──────────────────────────────────────
-function cadastrar() {
+async function cadastrar() {
   hideErro('cadErro');
   const nome     = (document.getElementById('cadNome').value    || '').trim();
   const usuario  = (document.getElementById('cadUsuario').value || '').trim();
   const senha    =  document.getElementById('cadSenha').value   || '';
   const confirma =  document.getElementById('cadConfirma').value || '';
-  if (!nome)    { showErro('cadErro', '⚠️ Informe seu nome completo.');             document.getElementById('cadNome').focus();    return; }
-  if (!usuario) { showErro('cadErro', '⚠️ Escolha um nome de usuário.');            document.getElementById('cadUsuario').focus(); return; }
+  const email    = (document.getElementById('cadEmail')?.value  || '').trim();
+  const btn      =  document.querySelector('.btn-primary-auth');
+
+  if (!nome)    { showErro('cadErro', '⚠️ Informe seu nome completo.');                   document.getElementById('cadNome').focus();    return; }
+  if (!usuario) { showErro('cadErro', '⚠️ Escolha um nome de usuário.');                  document.getElementById('cadUsuario').focus(); return; }
   if (/\s/.test(usuario)) { showErro('cadErro', '⚠️ O usuário não pode conter espaços.'); document.getElementById('cadUsuario').focus(); return; }
   if (!senha || senha.length < 6) { showErro('cadErro', '⚠️ A senha deve ter pelo menos 6 caracteres.'); document.getElementById('cadSenha').focus(); return; }
   if (senha !== confirma) {
     showErro('cadErro', '❌ As senhas não coincidem.');
     const el = document.getElementById('cadConfirma');
-    el.classList.add('error');
-    setTimeout(() => el.classList.remove('error'), 1500);
+    if (el) { el.classList.add('error'); setTimeout(() => el.classList.remove('error'), 1500); }
     return;
   }
-  const usuarios = garantirAdmin();
-  if (usuarios.find(u => u.usuario.toLowerCase() === usuario.toLowerCase())) {
-    showErro('cadErro', '❌ Este usuário já está em uso. Escolha outro.');
-    document.getElementById('cadUsuario').focus();
-    return;
+
+  setBtnLoading(btn, true);
+
+  try {
+    const resp = await fetch(`${API_URL}/api/cadastro`, {
+      method : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body   : JSON.stringify({ nome, usuario, email, senha })
+    });
+
+    const data = await resp.json();
+
+    if (!resp.ok) {
+      showErro('cadErro', '❌ ' + (data.erro || 'Erro ao cadastrar.'));
+      return;
+    }
+
+    showToast('✅ Conta criada! Redirecionando...');
+    setTimeout(() => { window.location.href = 'login.html'; }, 1400);
+
+  } catch (err) {
+    showErro('cadErro', '❌ Não foi possível conectar à API. Tente novamente.');
+    console.error('Erro no cadastro:', err);
+  } finally {
+    setBtnLoading(btn, false);
   }
-  const email = (document.getElementById('cadEmail')?.value || '').trim();
-  usuarios.push({ nome, usuario, email, senha });
-  saveUsuarios(usuarios);
-  showToast('✅ Conta criada! Redirecionando...');
-  setTimeout(() => { window.location.href = 'login.html'; }, 1400);
 }
 
 // ── NAVEGAÇÃO ──────────────────────────────────────
